@@ -1,0 +1,1 @@
+# pyusermanager Example implementation as fastapi api (and a webfrontend!)
