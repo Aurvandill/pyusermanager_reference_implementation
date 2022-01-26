@@ -1,0 +1,3 @@
+[submodule "web_interface/jquery"]
+	path = web_interface/jquery
+	url = https://github.com/jquery/jquery

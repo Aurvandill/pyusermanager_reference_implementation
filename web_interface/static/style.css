@@ -1,0 +1,67 @@
+.site-header {
+    background-color: rgba(0, 0, 0, .85);
+    transition: ease-in-out color .15s;
+}
+
+.login_container{
+    max-width: 1320px;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#backdrop{
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+.ModalERROR{
+    background-color: #dc3545;
+    color:white;
+}
+
+.ModalSUCCESS{
+    background-color: #198754;
+    color:white;
+}
+
+.ModalWARNING{
+    background-color: #ffc107;
+    color:white;
+}
+
+#user_icon:hover img{
+    -webkit-filter: invert(1) !important;
+    filter:invert(1) !important;
+}
+
+.inverted{
+    -webkit-filter: invert(1) !important;
+    filter:invert(1) !important;
+}
+
+#modal_msg{
+    color: black!important;
+}
+
+
+.accordion-button.collapsed {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+  }
+
+.token{
+      color: #dc3545;
+}
+
+.token:hover{
+    color: #f01a2f;
+    cursor: pointer;
+}

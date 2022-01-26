@@ -56,7 +56,7 @@ class Redirect():
         return tmp_dict
 
 
-def get_json(*args):
+def get_json_from_args(*args):
     temp_dict = {}
 
     for arg in args:
