@@ -18,6 +18,9 @@ def index():
 def index():
     return filestuff.get_template("header.html",**config) + filestuff.get_template("login.html") + filestuff.get_template("footer.html")
 
+@app.get('/users')
+def index():
+    return filestuff.get_template("header.html",**config) + filestuff.get_template("users.html") + filestuff.get_template("footer.html")
 
 @app.get('/static/<filename>')
 def static_files(filename):

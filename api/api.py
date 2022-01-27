@@ -1,5 +1,4 @@
 
-from re import T
 from pyusermanager import *
 
 import copy
@@ -7,8 +6,8 @@ import bottle
 from http import HTTPStatus
 
 from bottle import route, run, post, get, static_file, request, redirect, HTTPResponse, response
-from gevent import monkey
-monkey.patch_all()
+#from gevent import monkey
+#monkey.patch_all()
 
 
 from return_stuff import *
@@ -166,6 +165,9 @@ def api_get_header():
 
 @app.get('/users')
 def api_get_users():
+
+    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+
     return_response = get_default_response()
     return_response.status=HTTPStatus.UNAUTHORIZED
 
@@ -188,8 +190,8 @@ def api_get_users():
     else:
         print(token)
         #verify token
-        print(verify_token(str(token),"127.0.0.1"))
-        success, perms, username = verify_token(str(token),"127.0.0.1")
+        print(verify_token(str(token),ip))
+        success, perms, username = verify_token(str(token),ip)
         if success:
             return_response.status=HTTPStatus.OK
             user_dict = get_users()
@@ -201,6 +203,62 @@ def api_get_users():
             return_response.body = get_json_from_args(Alert("Bitte einloggen!",ALERT_TYPE.WARNING),Redirect("/login"))
 
     print(return_response)
+    return return_response
+
+@app.get('/user/<username>')
+def api_get_user(username):
+
+    ip = request.environ.get('HTTP_X_FORWARDED_FOR') or request.environ.get('REMOTE_ADDR')
+
+    return_response = get_default_response()
+    return_response.status=HTTPStatus.UNAUTHORIZED
+
+    request_params = dict(request.query.decode())
+
+    print(request_params)
+
+    try:
+        token = request_params["token"]
+    except Exception:
+        token = None
+
+    print(token)
+
+    if token is None or len(token) < 2:
+        return_response.status=HTTPStatus.UNAUTHORIZED
+        return_json = get_json_from_args(Alert("please log in",ALERT_TYPE.WARNING),Redirect("/login"))
+        #return_json = get_json_from_args(Alert("Bitte einloggen!",ALERT_TYPE.WARNING),Modal("du bist nicht eingelogt",MODAL_TYPE.ERROR,headline="satanismus") ,Redirect("/"))
+        return_response.body = return_json
+    else:
+        print(token)
+        #verify token
+        print(verify_token(str(token),ip))
+        success, perms, user_name = verify_token(str(token),ip)
+        if success:
+            return_response.status=HTTPStatus.OK
+            user_dict, token_dict, perm_dict = get_extended_info(user_name)
+
+            if username == user_name:
+                return_response.body = get_json_from_args(user_dict,token_dict,perm_dict)
+            elif LoginConfig.admin_group_name in perms:
+                return_response.body = get_json_from_args(user_dict,token_dict,perm_dict,{"Admin":True})
+            else:
+                return_response.body = get_json_from_args(user_dict)
+
+            print(return_response.body)
+        else:
+            return_response.status=HTTPStatus.UNAUTHORIZED
+            print(get_json_from_args(Alert("please log in",ALERT_TYPE.WARNING),Redirect("/login")))
+            return_response.body = get_json_from_args(Alert("Bitte einloggen!",ALERT_TYPE.WARNING),Redirect("/login"))
+
+    print(return_response)
+    return return_response
+
+@app.post('/user/delete')
+def api_delete_user():
+    return_response = get_default_response()
+
+
     return return_response
 
 @app.get('/logout')
@@ -278,6 +336,6 @@ if __name__ == "__main__":
     print(f"adding admin user to {LoginConfig.admin_group_name} group")
     assign_perm_to_user("admin",LoginConfig.admin_group_name)
 
-    app.run(host="0.0.0.0" , port=1337, debug=True, server='gevent')
+    app.run(host="0.0.0.0" , port=1337, debug=True, server='bjoern')
 
 

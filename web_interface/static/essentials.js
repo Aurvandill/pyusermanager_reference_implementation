@@ -147,7 +147,7 @@ function post(type, input_object = Object(), api_endpoint, object_to_update = nu
 
     
     //console.log(to_send)
-    $.ajax
+    return $.ajax
     ({
         type: type,
         url: api_url+"/"+api_endpoint,
