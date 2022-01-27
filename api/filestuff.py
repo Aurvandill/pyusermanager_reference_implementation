@@ -1,6 +1,4 @@
 
-
-
 def get_template(filename, **passed_vars):
     try:
         with open(f"./template/{filename}","r",encoding="utf-8") as file:

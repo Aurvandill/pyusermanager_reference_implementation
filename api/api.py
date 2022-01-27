@@ -1,7 +1,6 @@
 
 from pyusermanager import *
 
-import copy
 import bottle
 from http import HTTPStatus
 
@@ -227,23 +226,31 @@ def api_get_user(username):
     if token is None or len(token) < 2:
         return_response.status=HTTPStatus.UNAUTHORIZED
         return_json = get_json_from_args(Alert("please log in",ALERT_TYPE.WARNING),Redirect("/login"))
-        #return_json = get_json_from_args(Alert("Bitte einloggen!",ALERT_TYPE.WARNING),Modal("du bist nicht eingelogt",MODAL_TYPE.ERROR,headline="satanismus") ,Redirect("/"))
         return_response.body = return_json
     else:
         print(token)
         #verify token
         print(verify_token(str(token),ip))
-        success, perms, user_name = verify_token(str(token),ip)
+        success, perms, user = verify_token(str(token),ip)
+        include_mail = None
+        if user == username or LoginConfig.admin_group_name in perms:
+            include_mail = True
         if success:
             return_response.status=HTTPStatus.OK
-            user_dict, token_dict, perm_dict = get_extended_info(user_name)
+            try:
+                user_dict, token_dict, perm_dict = get_extended_info(username,include_mail)
+            except MissingUserException:
+                return_response.status=HTTPStatus.BAD_REQUEST
+                return_response.body = get_json_from_args(Alert("User does not Exist",ALERT_TYPE.DANGER),Redirect("/users"))
+                return return_response
 
-            if username == user_name:
-                return_response.body = get_json_from_args(user_dict,token_dict,perm_dict)
-            elif LoginConfig.admin_group_name in perms:
-                return_response.body = get_json_from_args(user_dict,token_dict,perm_dict,{"Admin":True})
+            
+            if LoginConfig.admin_group_name in perms:
+                return_response.body = get_json_from_args({"user":user_dict},{"token":token_dict},{"groups":perm_dict},{"Admin":True})
+            elif username == user:
+                return_response.body = get_json_from_args({"user":user_dict},{"token":token_dict},{"groups":perm_dict})
             else:
-                return_response.body = get_json_from_args(user_dict)
+                return_response.body = get_json_from_args({"user":user_dict},{"groups":perm_dict})
 
             print(return_response.body)
         else:
@@ -254,8 +261,8 @@ def api_get_user(username):
     print(return_response)
     return return_response
 
-@app.post('/user/delete')
-def api_delete_user():
+@app.post('/user/delete/<username>')
+def api_delete_user(username):
     return_response = get_default_response()
 
 

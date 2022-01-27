@@ -44,7 +44,7 @@ function check_status(){
     }
 
     var newURL = window.location.href.split("?")[0];
-    window.history.pushState('object', document.title, newURL);
+    //window.history.pushState('object', document.title, newURL);
 }
 
 function showAlert(){
