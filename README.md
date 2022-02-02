@@ -1,3 +1,6 @@
+# Notice
+this repository is deprecated since it was written to use pyusermanager v1.0.5 which is deprecated
+
 <h1 align="center">pyusermanager</h1>
 <p align="center">
 <a href="https://pypi.org/project/pyusermanager/"><img height="20" alt="PyPI version" src="https://img.shields.io/pypi/v/pyusermanager"></a>
